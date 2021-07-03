@@ -18,6 +18,8 @@ const Todo = () => (
 						<Col>
 							<TaskList />
 						</Col>
+						<Col id='comment-area'>
+						</Col>
 					</Row>
 				</Container>
 			</Card.Body>

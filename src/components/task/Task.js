@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
+
+import CommentList from '../commentList/CommentList';
 
 import './Task.css';
 
 const Task = props => {
     const done = props.completed;
     const [completed, setCompleted] = useState(done);
-    
+    const [commentSelected, setCommentSelected] = useState(props.id);
+
     const changeCompleted = async () => {
         await fetch(`http://127.0.0.1:8000/api/v1/tasks/update/${props.id}/`, {
             headers: {
@@ -27,6 +31,11 @@ const Task = props => {
         })
     }
 
+
+    const viewComments = () => {
+        ReactDOM.render(<CommentList commentSelected={commentSelected} setCommentSelected={setCommentSelected} id={props.id} />, document.querySelector('#comment-area'));
+    }
+
     const deleteTask = async () => {
         await fetch(`http://127.0.0.1:8000/api/v1/tasks/delete/${props.id}/`, {
             headers: {
@@ -43,6 +52,7 @@ const Task = props => {
             })
             props.parent.setTodoList(newList);
         })
+        ReactDOM.render('', document.querySelector('#comment-area'));
     }
     
     return (
@@ -51,7 +61,7 @@ const Task = props => {
                 <div className='col-sm-6'>{props.text}</div>
                 <div className='col-sm-6'>
                     <button className='btn btn-sm btn-secondary' onClick={changeCompleted}>{completed ? 'ToDo' : 'Complete'}</button>
-                    <button className='btn btn-sm btn-warning'>Comments</button>
+                    <button className='btn btn-sm btn-warning' onClick={viewComments}>Comments</button>
                     <button className='btn btn-sm btn-danger' onClick={deleteTask}>Delete</button>
                 </div>
             </div>
