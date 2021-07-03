@@ -1,42 +1,62 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import './Task.css';
 
-const Task = () => {
+const Task = props => {
+    const done = props.completed;
+    const [completed, setCompleted] = useState(done);
+    
+    const changeCompleted = async () => {
+        await fetch(`http://127.0.0.1:8000/api/v1/tasks/update/${props.id}/`, {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            method: 'PATCH',                                                              
+            body: JSON.stringify( { completed: !completed } )                                        
+        })
+        .then(data => {
+            setCompleted(!completed);
+            const newList = props.parent.todoList.map(element => {
+                if (element.id === props.id) {
+                    element.completed = !element.completed
+                }
+                return element
+            })
+            props.parent.setTodoList(newList);
+        })
+    }
+
+    const deleteTask = async () => {
+        await fetch(`http://127.0.0.1:8000/api/v1/tasks/delete/${props.id}/`, {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            method: 'DELETE'                                       
+        }).then(() =>{
+            const newList = props.parent.todoList.filter(element => {
+                if (element.id !== props.id) {
+                    return true;
+                }
+                return false;
+            })
+            props.parent.setTodoList(newList);
+        })
+    }
+    
     return (
-        <div className='card'>
-            <div className='card-body'>
-                <div className='input-group mb-3'>
-                    <input type='text' className='form-control' id='taskText' name='taskText' placeholder='What needs to be done?' aria-label='What needs to be done?' aria-describedby='btnAddTask' />
-                    <div className='input-group-append content-btn'>
-                        <button className='btn btn-success' type='button' id='btnAddTask'>Add Task</button>
-                    </div>
+        <li className={completed ? 'list-group-item text-decoration-line-through' : 'list-group-item'}>
+            <div className='row'>
+                <div className='col-sm-6'>{props.text}</div>
+                <div className='col-sm-6'>
+                    <button className='btn btn-sm btn-secondary' onClick={changeCompleted}>{completed ? 'ToDo' : 'Complete'}</button>
+                    <button className='btn btn-sm btn-warning'>Comments</button>
+                    <button className='btn btn-sm btn-danger' onClick={deleteTask}>Delete</button>
                 </div>
             </div>
-            <ul id='task-container' className='list-group list-group-flush'>
-                <li className='list-group-item'>An item</li>
-                <li className='list-group-item'>A second item</li>
-                <li className='list-group-item'>A third item</li>
-            </ul>
-            <div className='card-body'>
-                <div className='row'>
-                    <div className='col-sm-2'>
-                        <spam># items</spam>
-                    </div>
-                    <div className='col-sm-6'>
-                        <div class='btn-group'>
-                            <button id='btnAll' className='btn btn-sm btn-outline-secondary active'>All</button>
-                            <button id='btnActive' className='btn btn-sm btn-outline-secondary'>Active</button>
-                            <button id='btnCompleted' className='btn btn-sm btn-outline-secondary'>Completed</button>
-                        </div>
-                    </div>
-                    <div className='col-sm-4'>
-                        <button id='btnClearCompleted' className='btn btn-sm btn-outline-secondary'>Clear Completed</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </li>
     );
-};
+}
 
 export default Task;

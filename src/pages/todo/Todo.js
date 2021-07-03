@@ -5,7 +5,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-import Task from '../../components/task/Task';
+import TaskList from '../../components/taskList/TaskList';
 
 import './Todo.css';
 
@@ -16,9 +16,7 @@ const Todo = () => (
 				<Container>
 					<Row>
 						<Col>
-							<Task />
-						</Col>
-						<Col>
+							<TaskList />
 						</Col>
 					</Row>
 				</Container>
